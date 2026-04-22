@@ -1,19 +1,4 @@
-Books=[]
-issued_Books=[]
-def add_Book():
-    name=input("enter the book name:")
-    Books.append(name)
-    print(name,"is added successfully")
 
-def show_books():
-    if len(Books)==0:
-        print('No Books available')
-    else:
-        print("Print available books")
-        for b in Books:
-            print(b)
-
-def issue_Book():
     if len(Books)==0:
         print("no books available")
         return
