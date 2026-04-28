@@ -1,43 +1,119 @@
+Import datetime
+# Dictionary to store books
+library = {}
+def add_book():
+    book_id = input("Enter Book ID: ")
+    name = input("Enter Book Name: ")
+    author = input("Enter Author: ")
 
-    if len(Books)==0:
-        print("no books available")
+    library[book_id] = {
+        "name": name,
+        "author": author,
+        "issued": False,
+        "student": None,
+        "issue_date": None,
+        "duration": 0
+    }
+    print(" Book added successfully!\n")
+
+def view_books():
+    if not library:
+        print(" No books available.\n")
         return
-    else:
-        show_books()
-        name=input("enter the book name you want")
-        if name in Books:
-           issued_Books.append(name)
-           Books.remove(name)
-           print(name,"is issued")
-        else:
-            print(name,"is not available")
 
-def return_Book():
-    name=input("enter the book you want to return")
-    if name in issued_Books:
-        issued_Books.remove(name)
-        Books.append(name)
-        print(name,"book returned")
+    for book_id, details in library.items():
+        print(f"\nID: {book_id}")
+        print(f"Name: {details['name']}")
+        print(f"Author: {details['author']}")
+        print(f"Issued: {details['issued']}")
+        if details['issued']:
+            print(f"Issued to: {details['student']}")
+    print()
+
+def issue_book():
+    book_id = input("Enter Book ID to issue: ")
+
+    if book_id in library and not library[book_id]['issued']:
+        student = input("Enter Student Name: ")
+        duration = int(input("Enter duration (in days): "))
+
+        issue_date = datetime.date.today()
+
+        library[book_id]['issued'] = True
+        library[book_id]['student'] = student
+        library[book_id]['issue_date'] = issue_date
+        library[book_id]['duration'] = duration
+
+        print(" Book issued successfully!\n")
     else:
-        print(name,"book not issued")
-def library():
+        print(" Book not available or already issued.\n")
+
+
+# Return Book
+def return_book():
+    book_id = input("Enter Book ID to return: ")
+
+    if book_id in library and library[book_id]['issued']:
+        return_date = datetime.date.today()
+        issue_date = library[book_id]['issue_date']
+        duration = library[book_id]['duration']
+
+        days_used = (return_date - issue_date).days
+
+        fine = calculate_fine(days_used, duration)
+
+        print(f"\nDays used: {days_used}")
+        print(f"Fine: ₹{fine}")
+
+        # Reset book
+        library[book_id]['issued'] = False
+        library[book_id]['student'] = None
+        library[book_id]['issue_date'] = None
+        library[book_id]['duration'] = 0
+
+        print(" Book returned successfully!\n")
+    else:
+        print("Invalid Book ID or not issued.\n")
+
+
+# Fine Calculation (Progressive per week)
+def calculate_fine(days_used, allowed_days):
+    if days_used <= allowed_days:
+        return 0
+
+    extra_days = days_used - allowed_days
+    weeks = extra_days // 7 + 1
+
+    fine = 0
+    rate = 10  
+
+    for i in range(weeks):
+        fine += rate
+        rate += 5 
+
+    return fine
+def menu():
     while True:
-        print("Menu")
-        print("1Add Book")
-        print("2 Show Book")
-        print("3 Issue Book")
-        print("4 Return Book")
-        print("5 Exit")
-        Choice=int(input("Enter your Choice:"))
-        if Choice==1:
-            add_Book()
-        elif Choice==2:
-            show_books()
-        elif Choice==3:
-            issue_Book()
-        elif Choice==4:
-            return_Book()
-        elif Choice==5:
-            print("Thankyou!")
-            break    
-library()
+        print("\nLibrary Management System ")
+        print("1. Add Book")
+        print("2. View Books")
+        print("3. Issue Book")
+        print("4. Return Book")
+        print("5. Exit")
+
+        choice = input("Enter your choice: ")
+
+        if choice == '1':
+            add_book()
+        elif choice == '2':
+            view_books()
+        elif choice == '3':
+            issue_book()
+        elif choice == '4':
+            return_book()
+        elif choice == '5':
+            print("Thank you!")
+            break
+        else:
+            print(" Invalid choice, try again.\n")
+menu()
